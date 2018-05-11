@@ -2,6 +2,11 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
 import sqlite3
+
+
+
+
+
 root=Tk()
 conn=sqlite3.connect("students")
 cur=conn.cursor()
