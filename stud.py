@@ -1,4 +1,7 @@
+import tkinter
 from tkinter import *
+from tkinter import filedialog
+from PIL import ImageTk, Image
 from tkinter import messagebox
 from tkinter import ttk
 import sqlite3
@@ -6,47 +9,55 @@ root=Tk()
 conn=sqlite3.connect("students")
 cur=conn.cursor()
 
+    
+
 def addclass():
     fr2.pack_forget()
     fr3.pack_forget()
-    fr1.pack()    
+    fr1.pack()
+    
+
     
 def addstu():
     fr1.pack_forget()
     fr3.pack_forget()
     fr2.pack()
    
+    
+    
+    
+    
 def view():
     fr2.pack_forget()
     fr1.pack_forget()
     fr3.pack()
    
 def insert():
-    
+    addstu()
+    addclass()
+   
     student_Id=stuid_text.get()
-    Name=stuname_text.get()
+    Name=name_text.get()
+    class_name=box_value.get()
     Mobile_no=mobi_text.get()
     Address=addr_text.get()
-    class_name=box_value.get()
-    e4.delete(0,END)
-    e5.delete(0,END)
-    com.delete(0,END)
-    e9.delete(0,END)
-    ea.delete(0,END)
-    l=[]
-    cur.execute("select* from bioo where student_Id=(?) and Name=(?)",(student_Id,Name,))
-    l=cur.fetchall()
-    print("kjgfhdgs",l)
-    if len(l)==0:
-        cur.execute("insert into bioo values(?,?,?,?,?)",(student_Id,Name,class_name,Mobile_no,Address))
-        conn.commit()
-        messagebox.showinfo("Info","Data recorded")
-        cur.execute("select * from bioo")
-        row=cur.fetchall()
-        print(row)
-    else:
-        messagebox.showinfo("Info","Already exists")
-        print("already inserted")
+    #cur.execute("create table studentdetails (student_Id varchar(50),Name varchar(50),class_name varchar(10),mobile_no int(50),Address varchar(200))" )
+    cur.execute("insert into studentdetails values(?,?,?,?,?)",(student_Id,Name,class_name,Mobile_no,Address))
+    conn.commit()
+    cur.execute("select * from studentdetails")
+    row=cur.fetchall()
+    print(row)
+
+def upload():
+    root.filename =  filedialog.askopenfilename(initialdir = "c:/Images",title = "choose your file",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
+    #list1.insert(root.filename)
+    print (root.filename)
+    img = Image.open(root.filename)
+    img=img.resize((150,150),Image.ANTIALIAS)
+    im=ImageTk.PhotoImage(img)
+    panel =tkinter.Label(fr2, image = im)
+    panel.image= im
+    panel.grid(row = 5, column = 155)
 
 
 menu=Menu(root)
@@ -54,6 +65,7 @@ root.config(menu=menu)
 a1=menu.add_cascade(label="Add class",command=addclass)
 b=menu.add_cascade(label="Add students",command=addstu)
 c=menu.add_cascade(label="View attendence",command=view)
+##frame 1 add class
 fr1=Frame(root)
 fr1.pack()
 l2=Label(fr1,text='classname')
@@ -71,9 +83,13 @@ e3.grid(row=1,column=11)
 
 b1=Button(fr1,text="Submit",width=12,command=insert)
 b1.grid(row=15,column=10,columnspan=5)
-#return classname_text,classt_text
-
+##frame 2 add student
 fr2=Frame(root)
+
+b1=Button(fr2,text="upload",width=12,command=upload)
+b1.grid(row=5,column=170,columnspan=5)
+##frame 2 add student
+
 
 l4=Label(fr2,text='student_Id')
 l4.grid(row=0,column=0)
@@ -84,8 +100,8 @@ e4.grid(row=0,column=1)
 
 l5=Label(fr2,text='Name')
 l5.grid(row=5,column=0)
-stuname_text=StringVar()
-e5=Entry(fr2,textvariable=stuname_text)
+name_text=StringVar()
+e5=Entry(fr2,textvariable=name_text)
 e5.grid(row=5,column=1)
 
 l8=Label(fr2,text='class')
@@ -108,10 +124,9 @@ addr_text=StringVar()
 ea=Entry(fr2,textvariable=addr_text)
 ea.grid(row=20,column=1)
 
-list1=Listbox(fr2,height=6,width=20)
-list1.grid(row=5,column=155,columnspan=5)
-lb=Label(fr2,text=' Photo')
-lb.grid(row=5,column=150)
+pic1=Label(fr2,text=' Photo', bg = 'white',height = 10, width = 20)
+pic1.grid(row=5,column=155)
+
 
 list2=Listbox(fr2,height=6,width=20)
 list2.grid(row=15,column=155,columnspan=5)
@@ -120,7 +135,7 @@ lc.grid(row=15,column=150)
 
 b1=Button(fr2,text="Submit",width=12,command=insert)
 b1.grid(row=50,column=75,rowspan=5)
-
+##frame 3 view
 fr3=Frame(root)
 l6=Label(fr3,text='Roll number')
 l6.grid(row=50,column=100)
@@ -133,8 +148,3 @@ l7.grid(row=55,column=100)
 name_text=StringVar()
 e7=Entry(fr3,textvariable=name_text)
 e7.grid(row=55,column=101)
-conn=sqlite3.connect("students")
-cur=conn.cursor()
-#cur.execute("create table bioo (student_Id varchar(50),Name varchar(50),Class_name varchar(10),mobile_no varchar(50),Address varchar(200))" )
-
-cur.execute("select *from bio")
